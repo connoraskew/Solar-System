@@ -37,18 +37,11 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         Movement();
-        if (Input.GetMouseButton(0))
-        {
-            PlanetSelector();
-        }
     }
 
     void Movement()
     {
         Vector3 pos = transform.position;
-
-
-
 
         if (Input.GetKey("w") || Input.GetKey(KeyCode.UpArrow) /* || Input.mousePosition.y >= Screen.height - panBoarderThickness*/)
         {
@@ -69,8 +62,6 @@ public class CameraController : MonoBehaviour
         {
             pos.x -= panSpeed * Time.deltaTime;
         }
-
-
 
         if (Input.GetKeyDown("space"))
         {
