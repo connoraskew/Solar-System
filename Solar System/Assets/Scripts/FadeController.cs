@@ -10,6 +10,8 @@ public class FadeController : MonoBehaviour
 
     private SpriteRenderer spriteRend;
 
+    public bool isBackground;
+
     void Start()
     {
         spriteRend = GetComponent<SpriteRenderer>();
@@ -19,13 +21,28 @@ public class FadeController : MonoBehaviour
     {
         if (isFading)
         {
-            if (spriteRend.color.a > 0)
+            float alphaToLerpTo = 0f;
+
+            if (isBackground)
+            {
+                alphaToLerpTo = 0f;
+            }
+            else
+            {
+                alphaToLerpTo = 0.3f;
+            }
+
+
+            if (spriteRend.color.a > alphaToLerpTo)
             {
                 Color color = spriteRend.color;
 
                 color.a -= fadeDuration * Time.deltaTime;
 
                 spriteRend.color = color;
+
+                Debug.Log(alphaToLerpTo);
+
             }
         }
         else
