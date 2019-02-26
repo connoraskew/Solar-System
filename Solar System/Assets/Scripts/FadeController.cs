@@ -40,14 +40,11 @@ public class FadeController : MonoBehaviour
                 color.a -= fadeDuration * Time.deltaTime;
 
                 spriteRend.color = color;
-
-                Debug.Log(alphaToLerpTo);
-
             }
         }
         else
         {
-            if (spriteRend.color.a < 1)
+            if (spriteRend.color.a < 0.5)
             {
                 Color color = spriteRend.color;
 

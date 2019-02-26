@@ -4,33 +4,37 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // make a quiz
+// add an info button which explains how to use and what each of the buttons do
 
 public class GameManager : MonoBehaviour
 {
-    public bool isCinematicMode;
+    [SerializeField] private bool isCinematicMode;
 
-    public GameObject background;
-    public GameObject ringsHolder;
-    public GameObject planetSelectorFadeCanvas;
-    public GameObject infoSelectorFadeCanvas;
-    public GameObject mainTextFadeCanvas;
+    [SerializeField] private GameObject planetContainer;
 
-    public GameObject UIRingsHolder;
+    [SerializeField] private GameObject ringsHolder;
 
-    public CameraController mainCamera;
-    Camera viewCam;
+    [SerializeField] private GameObject planetSelectorFadeCanvas;
+
+    [SerializeField] private GameObject infoSelectorFadeCanvas;
+
+    [SerializeField] private GameObject mainTextFadeCanvas;
+
+    [SerializeField] private GameObject UIRingsHolder;
+
+    [SerializeField] private CameraController mainCamera;
 
     [SerializeField] private Sprite eyeClosed;
     [SerializeField] private Sprite eyeOpen;
 
-    public Button cinematicButton;
+    [SerializeField] private Button cinematicButton;
 
-    public PlanetCollectiveInfo[] planetCollectiveInfo;
+    [SerializeField] private PlanetCollectiveInfo[] planetCollectiveInfo;
 
-    public Text PlanetInfoText;
+    [SerializeField] private Text PlanetInfoText;
 
-    public int planetIndex;
-    public int infoIndex;
+    [SerializeField] private int planetIndex;
+    [SerializeField] private int infoIndex;
 
     [SerializeField] private LayerMask ringsLayer;
     [SerializeField] private LayerMask planetsLayer;
@@ -39,10 +43,6 @@ public class GameManager : MonoBehaviour
     {
         isCinematicMode = false;
 
-        viewCam = Camera.main;
-
-        background.GetComponent<FadeController>().isFading = true;
-
         CinemaSetUp();
 
         PlanetSelector(0);
@@ -50,47 +50,9 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        RaycastHit hit;
-
-        Ray ray = viewCam.ScreenPointToRay(Input.mousePosition);
-
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-
-        float rayDistance;
-
-        if (groundPlane.Raycast(ray, out rayDistance))
+        if(Input.GetKeyDown(KeyCode.Escape))
         {
-            Vector3 point = ray.GetPoint(rayDistance);
-
-            Debug.DrawLine(ray.origin, point, Color.red);
-
-            float hitDistance = Vector3.Distance(Vector3.zero, point);
-
-            int currentSelectedPlanet = -1;
-
-            for (int i = 0; i < planetCollectiveInfo.Length; i++)
-            {
-                if (hitDistance <= planetCollectiveInfo[i].internalRadius)
-                {
-
-                    if (currentSelectedPlanet == -1 || planetCollectiveInfo[i].internalRadius < planetCollectiveInfo[currentSelectedPlanet].internalRadius)
-                    {
-                        currentSelectedPlanet = i;
-                    }
-                }
-            }
-            
-            for (int i = 0; i < planetCollectiveInfo.Length; i++)
-            {
-                if (i == currentSelectedPlanet)
-                {
-                    planetCollectiveInfo[i].fadeController.isFading = false;
-                }
-                else
-                {
-                    planetCollectiveInfo[i].fadeController.isFading = true;
-                }
-            }
+            Application.Quit();
         }
     }
 
@@ -105,8 +67,6 @@ public class GameManager : MonoBehaviour
     {
         if (isCinematicMode)
         {
-            background.GetComponent<FadeController>().isFading = false;
-
             for (int i = 0; i < ringsHolder.transform.childCount; i++)
             {
                 ringsHolder.transform.GetChild(i).GetComponent<FadeController>().isFading = true;
@@ -115,14 +75,15 @@ public class GameManager : MonoBehaviour
             cinematicButton.image.sprite = eyeClosed;
 
             planetSelectorFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
+
             infoSelectorFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
+
             mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
+
             mainCamera.SetCinemaMode();
         }
         else
         {
-            background.GetComponent<FadeController>().isFading = true;
-
             for (int i = 0; i < ringsHolder.transform.childCount; i++)
             {
                 ringsHolder.transform.GetChild(i).GetComponent<FadeController>().isFading = false;
@@ -131,8 +92,11 @@ public class GameManager : MonoBehaviour
             cinematicButton.image.sprite = eyeOpen;
 
             planetSelectorFadeCanvas.GetComponent<CanvasGroupController>().isFading = false;
+
             infoSelectorFadeCanvas.GetComponent<CanvasGroupController>().isFading = false;
+
             mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = false;
+
             mainCamera.SetNonCinemode();
         }
     }
@@ -172,6 +136,38 @@ public class GameManager : MonoBehaviour
 
         AssignText(planetIndex, infoIndex);
     }
+
+    public void RingRremoval()
+    {
+        if (ringsHolder.gameObject.activeInHierarchy)
+        {
+            ringsHolder.SetActive(false);
+        }
+        else
+        {
+            ringsHolder.SetActive(true);
+        }
+    }
+
+    public void PlanetStopper()
+    {
+        if (planetContainer.transform.GetChild(0).GetComponent<RotationScript>().actualRotationSpeed == 0)
+        {
+            for (int i = 0; i < planetContainer.transform.childCount; i++)
+            {
+                RotationScript rotator = planetContainer.transform.GetChild(i).GetComponent<RotationScript>();
+                rotator.actualRotationSpeed = rotator.baseSpeed;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < planetContainer.transform.childCount; i++)
+            {
+                RotationScript rotator = planetContainer.transform.GetChild(i).GetComponent<RotationScript>();
+                rotator.actualRotationSpeed = 0;
+            }
+        }
+    }
 }
 
 [System.Serializable]
@@ -188,5 +184,4 @@ public struct PlanetCollectiveInfo
     //internal stuff
     public float internalRadius;
     public FadeController fadeController;
-
 }

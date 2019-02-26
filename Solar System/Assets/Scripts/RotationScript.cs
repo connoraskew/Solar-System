@@ -5,14 +5,18 @@ using UnityEngine;
 public class RotationScript : MonoBehaviour
 {
     public float rotationSpeed;
-    private float actualRotationSpeed;
+    public float actualRotationSpeed;
     public float dampAmount;
 
     public bool isPlanet;
 
+    public float baseSpeed;
+
     void Start()
     {
         actualRotationSpeed = 100 / -rotationSpeed;
+        baseSpeed = actualRotationSpeed;
+
         if (isPlanet)
         {
             float yRotation = Random.Range(0f, 360f);
@@ -23,7 +27,6 @@ public class RotationScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         transform.Rotate((Vector3.up * actualRotationSpeed) * (Time.deltaTime * dampAmount), Space.Self);
