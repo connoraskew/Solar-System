@@ -36,12 +36,21 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int planetIndex;
     [SerializeField] private int infoIndex;
 
-    [SerializeField] private LayerMask ringsLayer;
-    [SerializeField] private LayerMask planetsLayer;
+    private Material previousSelectedPlanetsMaterial;
+    private Material currentSelectedPlanetsMaterial;
+
+    [Range(0,1)] public float highlightPercent;
+
+    private Camera viewCam;
+
+    [SerializeField] private PlanetTexts[] planetTexts;
+    int randomTextToSpawn;
 
     void Awake()
     {
         isCinematicMode = false;
+
+        viewCam = Camera.main;
 
         CinemaSetUp();
 
@@ -53,6 +62,48 @@ public class GameManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
+        }
+
+        Ray ray = viewCam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.DrawLine(ray.origin, hit.point, Color.red);
+
+            Color newColour = new Color(highlightPercent, highlightPercent, highlightPercent, 1);
+
+            GameObject currentPlanet = hit.collider.gameObject;
+
+            if (hit.collider.gameObject.name != "Sun")
+            {
+                currentSelectedPlanetsMaterial = currentPlanet.GetComponent<MeshRenderer>().material;
+
+                if (currentSelectedPlanetsMaterial.GetColor("_EmissionColor") != newColour)
+                {
+                    currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+                }
+            }
+
+            int planetTextIndex = currentPlanet.GetComponent<PlanetIndexer>().planetIndex;
+
+            if (randomTextToSpawn == -1)
+            {
+                randomTextToSpawn = Random.Range(0, planetTexts[planetTextIndex].textBoxes.Length);
+                Debug.Log(randomTextToSpawn);
+            }
+
+        }
+        else
+        {
+            if (currentSelectedPlanetsMaterial != null)
+            {
+                Color newColour = new Color(0, 0, 0, 1);
+                currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+                currentSelectedPlanetsMaterial = null;
+            }
+
+            randomTextToSpawn = -1;
         }
     }
 
@@ -180,8 +231,12 @@ public struct PlanetCollectiveInfo
     public string DistanceFromSun;
 
     public string OrbitDuration;
+}
 
-    //internal stuff
-    public float internalRadius;
-    public FadeController fadeController;
+[System.Serializable]
+public struct PlanetTexts
+{
+    public string name;
+
+    public GameObject[] textBoxes;
 }

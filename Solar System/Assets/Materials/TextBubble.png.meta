@@ -1,7 +1,16 @@
 fileFormatVersion: 2
-guid: cc3077b82a886bc4cbe061b12281bd4d
+guid: 790f7ee9686170848b037fe87847e35e
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: TextBubble_0
+    21300002: TextBubble_1
+    21300004: TextBubble_2
+    21300006: TextBubble_3
+    21300008: TextBubble_4
+    21300010: TextBubble_5
+    21300012: TextBubble_6
+    21300014: TextBubble_7
+    21300016: TextBubble_8
   externalObjects: {}
   serializedVersion: 5
   mipmaps:
@@ -38,7 +47,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -135,11 +144,31 @@ TextureImporter:
     androidETC2FallbackOverride: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: TextBubble_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 8, y: 11, z: 9, w: 9}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1f875d9f516c384982bfc2f1c6fed9f
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 9a0630affbdf50249982e139a166834b
+    spriteID: 672c26f31d3d9d242975c3433fe3ccd9
     vertices: []
     indices: 
     edges: []

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RingFadeController : MonoBehaviour
+public class PlanetIndexer : MonoBehaviour
 {
-    public int priority;
+    public int planetIndex;
 }
