@@ -36,10 +36,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int planetIndex;
     [SerializeField] private int infoIndex;
 
+
+    [SerializeField] private Vector3 hitPos;
+    [SerializeField] private Vector3 clickedPos;
+    [SerializeField] private float mouseTollerance;
+    [SerializeField] private GameObject activeTextBox;
+
+
     private Material previousSelectedPlanetsMaterial;
     private Material currentSelectedPlanetsMaterial;
+    private GameObject currentSelectedPlanet;
 
-    [Range(0,1)] public float highlightPercent;
+    [Range(0, 1)] public float highlightPercent;
 
     private Camera viewCam;
 
@@ -50,7 +58,13 @@ public class GameManager : MonoBehaviour
     {
         isCinematicMode = false;
 
+        clickedPos = new Vector3(999,999,999);
+
         viewCam = Camera.main;
+
+        mouseTollerance = 25f;
+
+        randomTextToSpawn = -1;
 
         CinemaSetUp();
 
@@ -59,25 +73,75 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
+
+        MouseRayCast();
+
+        InfoTextBoxes();
+    }
+
+    void InfoTextBoxes()
+    {
+
+        if (clickedPos != new Vector3(999, 999, 999))
+        {
+            Ray ray = viewCam.ScreenPointToRay(Input.mousePosition);
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+            float rayDistance;
+
+            if (groundPlane.Raycast(ray, out rayDistance))
+            {
+                hitPos = ray.GetPoint(rayDistance);
+
+
+
+                float mouseDistance = Vector3.Distance(hitPos, clickedPos);
+
+                //Debug.Log("clickedMousePos = " + clickedPos);
+                //Debug.Log("mouseDistance = " + mouseDistance);
+
+                if (mouseDistance >= mouseTollerance)
+                {
+                    mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = false;
+
+                    activeTextBox.GetComponent<CanvasGroupController>().isFading = true;
+
+                    clickedPos = new Vector3(999, 999, 999);
+                }
+            }
+        }
+    }
+
+    void MouseRayCast()
+    {
 
         Ray ray = viewCam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit))
-        {
+        { 
             Debug.DrawLine(ray.origin, hit.point, Color.red);
 
-            Color newColour = new Color(highlightPercent, highlightPercent, highlightPercent, 1);
+            currentSelectedPlanet = hit.collider.gameObject;
 
-            GameObject currentPlanet = hit.collider.gameObject;
+            currentSelectedPlanetsMaterial = currentSelectedPlanet.GetComponent<MeshRenderer>().material;
 
             if (hit.collider.gameObject.name != "Sun")
             {
-                currentSelectedPlanetsMaterial = currentPlanet.GetComponent<MeshRenderer>().material;
+                Color newColour = new Color(highlightPercent, highlightPercent, highlightPercent, 1);
+
+
+                if (currentSelectedPlanetsMaterial.GetColor("_EmissionColor") != newColour)
+                {
+                    currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+                }
+            }
+            else
+            {
+                Color newColour = new Vector4(0.749f, 0.333f, 0.333f, 1f);
 
                 if (currentSelectedPlanetsMaterial.GetColor("_EmissionColor") != newColour)
                 {
@@ -85,25 +149,90 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            int planetTextIndex = currentPlanet.GetComponent<PlanetIndexer>().planetIndex;
 
-            if (randomTextToSpawn == -1)
+
+            if (Input.GetMouseButtonDown(0))
             {
-                randomTextToSpawn = Random.Range(0, planetTexts[planetTextIndex].textBoxes.Length);
-                Debug.Log(randomTextToSpawn);
-            }
 
+                mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
+
+
+
+                int planetTextIndex = currentSelectedPlanet.GetComponent<PlanetIndexer>().planetIndex;
+
+                if (randomTextToSpawn == -1)
+                {
+                    randomTextToSpawn = Random.Range(0, planetTexts[planetTextIndex].textBoxes.Length);
+
+                    GameObject textToActivate = planetTexts[planetTextIndex].textBoxes[randomTextToSpawn];
+
+                    textToActivate.GetComponent<CanvasGroupController>().isFading = false;
+
+                    activeTextBox = textToActivate;
+
+                    RectTransform myRectTransform = activeTextBox.GetComponent<RectTransform>();
+
+                    myRectTransform.position = Input.mousePosition;
+
+                    // some phinese or finese? some added extra to make it look more polished
+                    // oh baby
+                    if (Input.mousePosition.y < Screen.height * 0.5)
+                    {
+                        if (Input.mousePosition.x < Screen.width * 0.5)
+                        {
+                            myRectTransform.localPosition += Vector3.right * (myRectTransform.rect.width * 0.5f);
+                            myRectTransform.localPosition += Vector3.up * (myRectTransform.rect.height * 0.5f);
+                        }
+                        else
+                        {
+                            myRectTransform.localPosition -= Vector3.right * (myRectTransform.rect.width * 0.5f);
+                            myRectTransform.localPosition += Vector3.up * (myRectTransform.rect.height * 0.5f);
+                        }
+                    }
+                    else
+                    {
+                        if (Input.mousePosition.x < Screen.width * 0.5)
+                        {
+                            myRectTransform.localPosition += Vector3.right * (myRectTransform.rect.width * 0.5f);
+                            myRectTransform.localPosition -= Vector3.up * (myRectTransform.rect.height * 0.5f);
+                        }
+                        else
+                        {
+                            myRectTransform.localPosition -= Vector3.right * (myRectTransform.rect.width * 0.5f);
+                            myRectTransform.localPosition -= Vector3.up * (myRectTransform.rect.height * 0.5f);
+                        }
+                    }
+                }
+
+                clickedPos = hit.point;
+            }
         }
         else
         {
-            if (currentSelectedPlanetsMaterial != null)
+            if (currentSelectedPlanet != null)
             {
-                Color newColour = new Color(0, 0, 0, 1);
-                currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
-                currentSelectedPlanetsMaterial = null;
-            }
+                if (currentSelectedPlanet.name != "Sun")
+                {
 
-            randomTextToSpawn = -1;
+                    if (currentSelectedPlanetsMaterial != null)
+                    {
+                        Color newColour = new Color(0, 0, 0, 1);
+                        currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+                        currentSelectedPlanetsMaterial = null;
+                    }
+                }
+                else
+                {
+                    if (currentSelectedPlanetsMaterial != null)
+                    {
+                        Color newColour = new Color(0.549f, 0.133f, 0.133f, 1f);
+                        currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+                        currentSelectedPlanetsMaterial = null;
+                    }
+                }
+                currentSelectedPlanet = null;
+                randomTextToSpawn = -1;
+            }
         }
     }
 
