@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private bool isCinematicMode;
 
+    [SerializeField] private bool isInfoMode;
+
     [SerializeField] private GameObject planetContainer;
 
     [SerializeField] private GameObject ringsHolder;
@@ -20,7 +22,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject mainTextFadeCanvas;
 
-    [SerializeField] private GameObject UIRingsHolder;
+    [SerializeField] private GameObject infoFadeCanvas;
+    [SerializeField] private Scrollbar infoScrollBar;
+
+    //[SerializeField] private GameObject UIRingsHolder;
 
     [SerializeField] private CameraController mainCamera;
 
@@ -37,10 +42,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int infoIndex;
 
 
-    [SerializeField] private Vector3 hitPos;
-    [SerializeField] private Vector3 clickedPos;
+    private Vector3 hitPos;
+    private Vector3 clickedPos;
     [SerializeField] private float mouseTollerance;
-    [SerializeField] private GameObject activeTextBox;
+    private GameObject activeTextBox;
 
 
     private Material previousSelectedPlanetsMaterial;
@@ -58,7 +63,9 @@ public class GameManager : MonoBehaviour
     {
         isCinematicMode = false;
 
-        clickedPos = new Vector3(999,999,999);
+        isInfoMode = false;
+
+        clickedPos = new Vector3(999, 999, 999);
 
         viewCam = Camera.main;
 
@@ -96,12 +103,7 @@ public class GameManager : MonoBehaviour
             {
                 hitPos = ray.GetPoint(rayDistance);
 
-
-
                 float mouseDistance = Vector3.Distance(hitPos, clickedPos);
-
-                //Debug.Log("clickedMousePos = " + clickedPos);
-                //Debug.Log("mouseDistance = " + mouseDistance);
 
                 if (mouseDistance >= mouseTollerance)
                 {
@@ -117,12 +119,12 @@ public class GameManager : MonoBehaviour
 
     void MouseRayCast()
     {
-
         Ray ray = viewCam.ScreenPointToRay(Input.mousePosition);
+
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit))
-        { 
+        {
             Debug.DrawLine(ray.origin, hit.point, Color.red);
 
             currentSelectedPlanet = hit.collider.gameObject;
@@ -132,7 +134,6 @@ public class GameManager : MonoBehaviour
             if (hit.collider.gameObject.name != "Sun")
             {
                 Color newColour = new Color(highlightPercent, highlightPercent, highlightPercent, 1);
-
 
                 if (currentSelectedPlanetsMaterial.GetColor("_EmissionColor") != newColour)
                 {
@@ -149,14 +150,9 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-
-
             if (Input.GetMouseButtonDown(0))
             {
-
                 mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
-
-
 
                 int planetTextIndex = currentSelectedPlanet.GetComponent<PlanetIndexer>().planetIndex;
 
@@ -164,44 +160,27 @@ public class GameManager : MonoBehaviour
                 {
                     randomTextToSpawn = Random.Range(0, planetTexts[planetTextIndex].textBoxes.Length);
 
-                    GameObject textToActivate = planetTexts[planetTextIndex].textBoxes[randomTextToSpawn];
+                    //GameObject textToActivate = planetTexts[planetTextIndex].textBoxes[randomTextToSpawn];
+                    activeTextBox = planetTexts[planetTextIndex].textBoxes[randomTextToSpawn];
 
-                    textToActivate.GetComponent<CanvasGroupController>().isFading = false;
+                    activeTextBox.GetComponent<CanvasGroupController>().isFading = false;
 
-                    activeTextBox = textToActivate;
+                    //activeTextBox = textToActivate;
 
                     RectTransform myRectTransform = activeTextBox.GetComponent<RectTransform>();
 
                     myRectTransform.position = Input.mousePosition;
 
-                    // some phinese or finese? some added extra to make it look more polished
-                    // oh baby
-                    if (Input.mousePosition.y < Screen.height * 0.5)
+                    if (Input.mousePosition.x < Screen.width * 0.5)
                     {
-                        if (Input.mousePosition.x < Screen.width * 0.5)
-                        {
-                            myRectTransform.localPosition += Vector3.right * (myRectTransform.rect.width * 0.5f);
-                            myRectTransform.localPosition += Vector3.up * (myRectTransform.rect.height * 0.5f);
-                        }
-                        else
-                        {
-                            myRectTransform.localPosition -= Vector3.right * (myRectTransform.rect.width * 0.5f);
-                            myRectTransform.localPosition += Vector3.up * (myRectTransform.rect.height * 0.5f);
-                        }
+                        myRectTransform.localPosition += Vector3.right * (myRectTransform.rect.width * 0.6f);
                     }
                     else
                     {
-                        if (Input.mousePosition.x < Screen.width * 0.5)
-                        {
-                            myRectTransform.localPosition += Vector3.right * (myRectTransform.rect.width * 0.5f);
-                            myRectTransform.localPosition -= Vector3.up * (myRectTransform.rect.height * 0.5f);
-                        }
-                        else
-                        {
-                            myRectTransform.localPosition -= Vector3.right * (myRectTransform.rect.width * 0.5f);
-                            myRectTransform.localPosition -= Vector3.up * (myRectTransform.rect.height * 0.5f);
-                        }
+                        myRectTransform.localPosition -= Vector3.right * (myRectTransform.rect.width * 0.6f);
                     }
+
+                    myRectTransform.localPosition += Vector3.up * (myRectTransform.rect.height * 0.6f);
                 }
 
                 clickedPos = hit.point;
@@ -217,7 +196,9 @@ public class GameManager : MonoBehaviour
                     if (currentSelectedPlanetsMaterial != null)
                     {
                         Color newColour = new Color(0, 0, 0, 1);
+
                         currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+
                         currentSelectedPlanetsMaterial = null;
                     }
                 }
@@ -226,11 +207,14 @@ public class GameManager : MonoBehaviour
                     if (currentSelectedPlanetsMaterial != null)
                     {
                         Color newColour = new Color(0.549f, 0.133f, 0.133f, 1f);
+
                         currentSelectedPlanetsMaterial.SetColor("_EmissionColor", newColour);
+
                         currentSelectedPlanetsMaterial = null;
                     }
                 }
                 currentSelectedPlanet = null;
+
                 randomTextToSpawn = -1;
             }
         }
@@ -242,6 +226,31 @@ public class GameManager : MonoBehaviour
 
         CinemaSetUp();
     }
+
+    public void InfoButtonPress()
+    {
+        isInfoMode = !isInfoMode;
+
+        InfoSetUp();
+    }
+
+    void InfoSetUp()
+    {
+        if (isInfoMode)
+        {
+            mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
+
+            infoFadeCanvas.GetComponent<CanvasGroupController>().isFading = false;
+
+            infoScrollBar.value = 1.0f;
+        }
+        else
+        {
+            mainTextFadeCanvas.GetComponent<CanvasGroupController>().isFading = false;
+
+            infoFadeCanvas.GetComponent<CanvasGroupController>().isFading = true;
+        }    
+    } 
 
     void CinemaSetUp()
     {
@@ -336,6 +345,7 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < planetContainer.transform.childCount; i++)
             {
                 RotationScript rotator = planetContainer.transform.GetChild(i).GetComponent<RotationScript>();
+
                 rotator.actualRotationSpeed = rotator.baseSpeed;
             }
         }
@@ -344,6 +354,7 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < planetContainer.transform.childCount; i++)
             {
                 RotationScript rotator = planetContainer.transform.GetChild(i).GetComponent<RotationScript>();
+
                 rotator.actualRotationSpeed = 0;
             }
         }
