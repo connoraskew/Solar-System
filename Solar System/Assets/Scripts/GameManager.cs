@@ -8,9 +8,9 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private bool isCinematicMode;
+    private bool isCinematicMode;
 
-    [SerializeField] private bool isInfoMode;
+    private bool isInfoMode;
 
     [SerializeField] private GameObject planetContainer;
 
@@ -23,9 +23,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject mainTextFadeCanvas;
 
     [SerializeField] private GameObject infoFadeCanvas;
-    [SerializeField] private Scrollbar infoScrollBar;
 
-    //[SerializeField] private GameObject UIRingsHolder;
+    [SerializeField] private Scrollbar infoScrollBar;
 
     [SerializeField] private CameraController mainCamera;
 
@@ -160,12 +159,16 @@ public class GameManager : MonoBehaviour
                 {
                     randomTextToSpawn = Random.Range(0, planetTexts[planetTextIndex].textBoxes.Length);
 
-                    //GameObject textToActivate = planetTexts[planetTextIndex].textBoxes[randomTextToSpawn];
+                    print(randomTextToSpawn);
+
+                    if(activeTextBox!=null)
+                    {
+                        activeTextBox.GetComponent<CanvasGroupController>().isFading = true;
+                    }
+
                     activeTextBox = planetTexts[planetTextIndex].textBoxes[randomTextToSpawn];
 
                     activeTextBox.GetComponent<CanvasGroupController>().isFading = false;
-
-                    //activeTextBox = textToActivate;
 
                     RectTransform myRectTransform = activeTextBox.GetComponent<RectTransform>();
 
