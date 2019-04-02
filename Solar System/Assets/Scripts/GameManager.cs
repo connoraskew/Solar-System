@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private PlanetCollectiveInfo[] planetCollectiveInfo;
 
+    [SerializeField] private Text PlanetTitleText;
     [SerializeField] private Text PlanetInfoText;
 
     [SerializeField] private int planetIndex;
@@ -295,24 +296,21 @@ public class GameManager : MonoBehaviour
 
     void AssignText(int pIndex, int iIndex)
     {
-        string textToOutput = "";
 
-        textToOutput += planetCollectiveInfo[pIndex].name;
+        PlanetTitleText.text = planetCollectiveInfo[pIndex].name;
 
         switch (iIndex)
         {
             default:
-                textToOutput += planetCollectiveInfo[planetIndex].Diameter;
+                PlanetInfoText.text = planetCollectiveInfo[planetIndex].Diameter;
                 break;
             case 1:
-                textToOutput += planetCollectiveInfo[planetIndex].DistanceFromSun;
+                PlanetInfoText.text = planetCollectiveInfo[planetIndex].DistanceFromSun;
                 break;
             case 2:
-                textToOutput += planetCollectiveInfo[planetIndex].OrbitDuration;
+                PlanetInfoText.text = planetCollectiveInfo[planetIndex].OrbitDuration;
                 break;
         }
-
-        PlanetInfoText.text = textToOutput.ToString();
     }
 
     public void PlanetSelector(int index)
