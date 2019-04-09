@@ -85,14 +85,16 @@ public class GameManager : MonoBehaviour
             Application.Quit();
         }
 
-        MouseRayCast();
+        if (!isCinematicMode)
+        {
+            MouseRayCast();
+        }
 
         InfoTextBoxes();
     }
 
     void InfoTextBoxes()
-    {
-
+    {        
         if (clickedPos != new Vector3(999, 999, 999))
         {
             Ray ray = viewCam.ScreenPointToRay(Input.mousePosition);
