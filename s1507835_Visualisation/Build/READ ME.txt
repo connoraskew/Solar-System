@@ -1,0 +1,7 @@
+Resolution: 1920 x 1080
+
+First thing for you to do when the project opens
+is the press the big white "I" button in the top 
+right to help give you an idea of what you can do in the project
+
+You can press the "Esc" key to close the program
